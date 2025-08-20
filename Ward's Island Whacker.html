@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ward's Island Whacker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .match-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-bottom: 2px solid #4CAF50;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .match-info span {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .shot-selection {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .shot-selection h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .variable-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .variable-section h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .option-btn {
+            padding: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .option-btn:hover {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+
+        .option-btn.selected {
+            background: #4CAF50;
+            color: white;
+            border-color: #45a049;
+        }
+
+        .court-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .court-canvas {
+            border: 3px solid #333;
+            border-radius: 5px;
+            cursor: crosshair;
+            background: #228B22;
+            margin-bottom: 10px;
+        }
+
+        .coord-display {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .main-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .main-btn {
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .enter-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .enter-btn:hover {
+            background: #45a049;
+        }
+
+        .new-point-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .new-point-btn:hover {
+            background: #1976D2;
+        }
+
+        .new-match-btn {
+            background: #FF9800;
+            color: white;
+        }
+
+        .new-match-btn:hover {
+            background: #F57C00;
+        }
+
+        .export-btn {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #7B1FA2;
+        }
+
+        .back-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background: #d32f2f;
+        }
+
+        .clear-btn {
+            background: #607D8B;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #455A64;
+        }
+
+        .data-table-container {
+            background: white;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .data-table th {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .data-table tr:hover {
+            background: #f0f8f0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .match-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            /* Show 2 variable sections per row instead of one */
+            .selection-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .variable-section {
+                padding: 8px;
+                border-radius: 6px;
+            }
+
+            .variable-section h3 {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            /* Buttons smaller & tighter */
+            .option-btn {
+                padding: 6px 8px;
+                font-size: 12px;
+                border-radius: 4px;
+            }
+
+            /* If a section has many buttons, let it scroll */
+            .button-group {
+                max-height: 100px;
+                overflow-y: auto;
+            }
+
+            /* Main buttons stack neatly */
+            .main-buttons {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .main-btn {
+                width: 100%;
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-btn.ok {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Stroke: show 2 columns */
+        .stroke-section .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        /* Outcome: tighten layout and move ENTER button inside */
+        .outcome-section {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding-bottom: 10px;
+        }
+
+        .outcome-section .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .outcome-section .enter-btn {
+            margin-top: 10px;
+            align-self: center;
+            width: 100%;
+        }
+
+        /* Make Tempo and Stroke boxes a little taller */
+        .tempo-section,
+        .stroke-section {
+            min-height: 130px;
+            /* adjust as needed */
+        }
+
+        .modal-btn.cancel {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Stroke: remove scroll and make 2 columns */
+        .stroke-section .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        /* Outcome section buttons styling */
+        .outcome-section .main-btn {
+            margin-top: 6px;
+            width: 100%;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎾 Ward's Island Whacker</h1>
+        </div>
+
+        <div class="match-info" id="matchInfo">
+            <span>Match: <span id="currentMatch">Match 1</span></span>
+            <span>Point: <span id="currentPoint">1</span></span>
+            <span>Hit: <span id="currentHit">1</span></span>
+            <button class="main-btn new-match-btn" onclick="newMatch()">New Match</button>
+        </div>
+
+        <div class="content">
+            <div class="shot-selection">
+                <div class="selection-grid" id="selectionGrid">
+                    <!-- Selection buttons will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="main-buttons">
+                <button class="main-btn export-btn" onclick="exportToCSV()">Export to CSV</button>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Match</th>
+                            <th>Point</th>
+                            <th>Hit</th>
+                            <th>Player</th>
+                            <th>Test Condition</th>
+                            <th>Tempo</th>
+                            <th>Stroke</th>
+                            <th>Outcome</th>
+                            <th>Shot X</th>
+                            <th>Shot Y</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- Data rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for input dialogs -->
+    <div id="inputModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Enter Information</h3>
+            <input type="text" id="modalInput" class="modal-input" placeholder="Enter value...">
+            <div class="modal-buttons">
+                <button class="modal-btn ok" onclick="modalOK()">OK</button>
+                <button class="modal-btn cancel" onclick="modalCancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let shotData = [];
+        let currentShot = {};
+        let currentMatchName = "Match 1";
+        let currentPoint = 1;
+        let currentHit = 1;
+        let playerNames = ['Player 1', 'Player 2'];
+        let shotLocationX = null;
+        let shotLocationY = null;
+        let modalCallback = null;
+        let lastSelectedPlayer = null;
+
+        // Shot variables configuration
+        const shotVariables = {
+            'Player': () => playerNames,
+            'Test Condition': ['Serve', 'Baseline', 'Return'],
+            'Tempo': ['Light', 'Medium', 'Hard'],
+            'Stroke': ['Serve', 'Forehand', 'Backhand', 'Drop Shot', 'Lob'],
+            'Outcome': ['Win', 'Lose'],
+            'Shot Location': 'COURT_CLICK'
+        };
+
+        // Initialize the app
+        function initializeApp() {
+            createSelectionGrid();
+            updateMatchInfo();
+            updateDataDisplay();
+        }
+
+        // Create the selection grid
+        function createSelectionGrid() {
+            const grid = document.getElementById('selectionGrid');
+            grid.innerHTML = '';
+
+            for (const [variable, options] of Object.entries(shotVariables)) {
+                const section = document.createElement('div');
+                section.className = 'variable-section';
+
+                const title = document.createElement('h3');
+                title.textContent = variable;
+                section.appendChild(title);
+
+                // Add special classes for styling
+                if (variable === 'Tempo') {
+                    section.classList.add('tempo-section');
+                }
+
+                if (variable === 'Stroke') {
+                    section.classList.add('stroke-section');
+                }
+
+                if (variable === 'Outcome') {
+                    section.classList.add('outcome-section');
+                }
+
+                if (variable === 'Shot Location') {
+                    createCourtWidget(section);
+                } else {
+                    const buttonGroup = document.createElement('div');
+                    buttonGroup.className = 'button-group';
+
+                    const variableOptions = typeof options === 'function' ? options() : options;
+                    variableOptions.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'option-btn';
+                        button.textContent = option;
+                        button.onclick = () => selectOption(variable, option);
+                        buttonGroup.appendChild(button);
+                    });
+
+                    section.appendChild(buttonGroup);
+                }
+
+                // If this is the Outcome box, add the ENTER button here
+                if (variable === 'Outcome') {
+                    // ENTER button
+                    const enterBtn = document.createElement('button');
+                    enterBtn.className = 'main-btn enter-btn';
+                    enterBtn.textContent = 'ENTER';
+                    enterBtn.onclick = () => enterShot();
+                    section.appendChild(enterBtn);
+
+                    // New Point button
+                    const newPointBtn = document.createElement('button');
+                    newPointBtn.className = 'main-btn new-point-btn';
+                    newPointBtn.textContent = 'New Point';
+                    newPointBtn.onclick = () => newPoint();
+                    section.appendChild(newPointBtn);
+
+                    // BACK button
+                    const backBtn = document.createElement('button');
+                    backBtn.className = 'main-btn back-btn';
+                    backBtn.textContent = 'BACK';
+                    backBtn.onclick = () => removeLastShot();
+                    section.appendChild(backBtn);
+                }
+
+                grid.appendChild(section);
+            }
+        }
+
+        // Create tennis court widget
+        function createCourtWidget(parentElement) {
+            const courtContainer = document.createElement('div');
+            courtContainer.className = 'court-container';
+
+            const canvas = document.createElement('canvas');
+            canvas.className = 'court-canvas';
+            canvas.width = 240;
+            canvas.height = 320;
+            canvas.id = 'courtCanvas';
+
+            const coordDisplay = document.createElement('div');
+            coordDisplay.className = 'coord-display';
+            coordDisplay.id = 'coordDisplay';
+            coordDisplay.textContent = 'Click on the court to select shot location';
+
+            courtContainer.appendChild(canvas);
+            courtContainer.appendChild(coordDisplay);
+            parentElement.appendChild(courtContainer);
+
+            // Draw the court after adding to DOM
+            setTimeout(() => {
+                drawCourt();
+            }, 0);
+
+            canvas.addEventListener('click', onCourtClick);
+        }
+
+        // Draw tennis court
+        function drawCourt() {
+            const canvas = document.getElementById('courtCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            // Clear canvas with court background
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const margin = 10;
+            const courtWidth = canvas.width - 2 * margin;
+            const courtHeight = canvas.height - 2 * margin;
+
+            // Court dimensions
+            const singlesWidth = courtWidth * (27 / 36);
+            const alleyWidth = courtWidth * (4.5 / 36);
+
+            const left = margin;
+            const right = canvas.width - margin;
+            const top = margin;
+            const bottom = canvas.height - margin;
+            const singlesLeft = left + alleyWidth;
+            const singlesRight = right - alleyWidth;
+
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+
+            // Outer court boundary
+            ctx.strokeRect(left, top, courtWidth, courtHeight);
+
+            // Singles court boundaries
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(singlesLeft, top);
+            ctx.lineTo(singlesLeft, bottom);
+            ctx.moveTo(singlesRight, top);
+            ctx.lineTo(singlesRight, bottom);
+            ctx.stroke();
+
+            // Service line
+            const serviceY = top + (courtHeight * (21 / 39));
+            ctx.beginPath();
+            ctx.moveTo(singlesLeft, serviceY);
+            ctx.lineTo(singlesRight, serviceY);
+            ctx.stroke();
+
+            // Center service line
+            const centerX = canvas.width / 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, top);
+            ctx.lineTo(centerX, serviceY);
+            ctx.stroke();
+
+            // Net line (at the top)
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'white';
+            ctx.beginPath();
+            ctx.moveTo(left, top);
+            ctx.lineTo(right, top);
+            ctx.stroke();
+
+            // Baseline
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(left, bottom);
+            ctx.lineTo(right, bottom);
+            ctx.stroke();
+        }
+
+        // Handle court click
+        function onCourtClick(event) {
+            const canvas = document.getElementById('courtCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = event.clientX - rect.left;
+            const canvasY = event.clientY - rect.top;
+
+            // Scale for device pixel ratio if needed
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const actualX = canvasX * scaleX;
+            const actualY = canvasY * scaleY;
+
+            const margin = 10;
+            const courtWidth = canvas.width - 2 * margin;
+            const courtHeight = canvas.height - 2 * margin;
+
+            const courtX = Math.max(0, Math.min(100, ((actualX - margin) / courtWidth) * 100));
+            const courtY = Math.max(0, Math.min(100, ((actualY - margin) / courtHeight) * 100));
+
+            shotLocationX = Math.round(courtX * 10) / 10;
+            shotLocationY = Math.round(courtY * 10) / 10;
+
+            currentShot['Shot Location'] = `(${shotLocationX}, ${shotLocationY})`;
+
+            // Update coordinate display
+            const coordDisplay = document.getElementById('coordDisplay');
+            coordDisplay.textContent = `Location: (${shotLocationX}, ${shotLocationY})`;
+
+            // Redraw court with click marker
+            drawCourt();
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'red';
+            ctx.strokeStyle = 'darkred';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(actualX, actualY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Select option
+        function selectOption(variable, option) {
+            currentShot[variable] = option;
+
+            if (variable === 'Player') {
+                lastSelectedPlayer = option;  // remember last selected player
+            }
+
+            // Update button states
+            const section = event.target.closest('.variable-section');
+            const buttons = section.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent === option) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        // NEW FUNCTION: Populate outcome for matching entries
+        function populateOutcomeForPoint(match, player, point, outcome) {
+            let updatedCount = 0;
+            
+            // Go through all shot data and update matching entries
+            shotData.forEach(shot => {
+                if (shot['Match'] === match && 
+                    shot['Player'] === player && 
+                    shot['Point'] === point && 
+                    (!shot['Outcome'] || shot['Outcome'] === '')) {
+                    shot['Outcome'] = outcome;
+                    updatedCount++;
+                }
+            });
+            
+            return updatedCount;
+        }
+
+        // Enter shot
+        function enterShot() {
+            // Check required fields
+            let requiredFields = ['Player'];
+            if (!('Outcome' in currentShot) || currentShot['Outcome'] === '') {
+                requiredFields.push('Stroke');
+            }
+
+            const missingFields = requiredFields.filter(field =>
+                !(field in currentShot) || currentShot[field] === '');
+
+            if (missingFields.length > 0) {
+                alert(`Please select: ${missingFields.join(', ')}`);
+                return;
+            }
+
+            // Create shot record
+            const shotRecord = {
+                'Match': currentMatchName,
+                'Point': currentPoint,
+                'Hit': currentHit,
+                'Player': currentShot['Player'] || '',
+                'Test Condition': currentShot['Test Condition'] || '',
+                'Tempo': currentShot['Tempo'] || '',
+                'Stroke': currentShot['Stroke'] || '',
+                'Outcome': currentShot['Outcome'] || '',
+                'Shot X': shotLocationX || '',
+                'Shot Y': shotLocationY || ''
+            };
+
+            shotData.push(shotRecord);
+
+            // NEW: If an outcome was entered, populate it for all previous entries with same Match/Player/Point
+            if (currentShot['Outcome'] && currentShot['Outcome'] !== '') {
+                const updatedCount = populateOutcomeForPoint(
+                    currentMatchName, 
+                    currentShot['Player'], 
+                    currentPoint, 
+                    currentShot['Outcome']
+                );
+                
+                if (updatedCount > 0) {
+                    console.log(`Updated ${updatedCount} previous entries with outcome: ${currentShot['Outcome']}`);
+                }
+            }
+
+            updateDataDisplay();
+
+            // Prepare for next shot
+            currentHit++;
+            resetCurrentShot();
+            updateMatchInfo();
+        }
+
+        // Reset current shot
+        function resetCurrentShot() {
+            currentShot = {};
+            shotLocationX = null;
+            shotLocationY = null;
+
+            // Reset all button states
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+
+            // Auto-select last chosen player
+            if (lastSelectedPlayer) {
+                currentShot['Player'] = lastSelectedPlayer;
+                const playerButtons = Array.from(document.querySelectorAll('.variable-section'))
+                    .find(section => section.querySelector('h3')?.textContent === 'Player')
+                    ?.querySelectorAll('.option-btn');
+                if (playerButtons) {
+                    playerButtons.forEach(btn => {
+                        if (btn.textContent === lastSelectedPlayer) {
+                            btn.classList.add('selected');
+                        }
+                    });
+                }
+            }
+
+            // Clear court and redraw
+            drawCourt();
+            const coordDisplay = document.getElementById('coordDisplay');
+            if (coordDisplay) {
+                coordDisplay.textContent = 'Click on the court to select shot location';
+            }
+        }
+
+        // New point
+        function newPoint() {
+            currentPoint++;
+            currentHit = 1;
+            resetCurrentShot();
+            updateMatchInfo();
+        }
+
+        // New match
+        function newMatch() {
+            showInputDialog("New Match", "Enter name for the new match:", "", (matchName) => {
+                if (matchName) {
+                    showInputDialog("Player Names", "Enter name for Player 1:", "", (player1) => {
+                        if (player1) {
+                            showInputDialog("Player Names", "Enter name for Player 2:", "", (player2) => {
+                                if (player2) {
+                                    // Clear all data
+                                    shotData = [];
+                                    currentMatchName = matchName;
+                                    playerNames = [player1, player2];
+                                    currentPoint = 1;
+                                    currentHit = 1;
+
+                                    // Update displays
+                                    createSelectionGrid();
+                                    resetCurrentShot();
+                                    updateDataDisplay();
+                                    updateMatchInfo();
+
+                                    alert(`Started new match: ${matchName}\nPlayers: ${player1} vs ${player2}`);
+                                } else {
+                                    alert("Player 2 name is required. Match creation cancelled.");
+                                }
+                            });
+                        } else {
+                            alert("Player 1 name is required. Match creation cancelled.");
+                        }
+                    });
+                }
+            });
+        }
+
+        // Show input dialog
+        function showInputDialog(title, message, initialValue, callback) {
+            const modal = document.getElementById('inputModal');
+            const titleElement = document.getElementById('modalTitle');
+            const inputElement = document.getElementById('modalInput');
+
+            titleElement.textContent = title;
+            inputElement.placeholder = message;
+            inputElement.value = initialValue;
+            modalCallback = callback;
+
+            modal.style.display = 'block';
+            inputElement.focus();
+        }
+
+        // Modal OK button
+        function modalOK() {
+            const input = document.getElementById('modalInput');
+            const value = input.value.trim();
+            const modal = document.getElementById('inputModal');
+
+            modal.style.display = 'none';
+            if (modalCallback) {
+                modalCallback(value);
+            }
+        }
+
+        // Modal Cancel button
+        function modalCancel() {
+            const modal = document.getElementById('inputModal');
+            modal.style.display = 'none';
+            if (modalCallback) {
+                modalCallback(null);
+            }
+        }
+
+        // Remove last shot
+        function removeLastShot() {
+            if (shotData.length === 0) {
+                alert("No shots to remove.");
+                return;
+            }
+
+            shotData.pop();
+
+            // Restore state
+            if (shotData.length > 0) {
+                const lastShot = shotData[shotData.length - 1];
+                currentMatchName = lastShot['Match'];
+                currentPoint = lastShot['Point'];
+                currentHit = lastShot['Hit'] + 1;
+            } else {
+                currentMatchName = "Match 1";
+                currentPoint = 1;
+                currentHit = 1;
+            }
+
+            updateDataDisplay();
+            updateMatchInfo();
+        }
+
+        // Export to CSV - automatic download
+        function exportToCSV() {
+            if (shotData.length === 0) {
+                alert("No shot data to export.");
+                return;
+            }
+
+            // Create CSV content
+            const headers = ['Match', 'Point', 'Hit', 'Player', 'Test Condition', 'Tempo', 'Stroke', 'Outcome', 'Shot X', 'Shot Y'];
+            let csvContent = headers.join(',') + '\n';
+
+            shotData.forEach(shot => {
+                const row = headers.map(header => {
+                    let value = shot[header] || '';
+                    // Wrap in quotes if contains comma, quote, or newline
+                    if (value.toString().includes(',') || value.toString().includes('"') || value.toString().includes('\n')) {
+                        value = '"' + value.toString().replace(/"/g, '""') + '"';
+                    }
+                    return value;
+                });
+                csvContent += row.join(',') + '\n';
+            });
+
+            // Create a downloadable Blob
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            // Create a temporary link to trigger download
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+
+            // Add timestamp to filename
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+            link.setAttribute("download", `tennis_shots_${timestamp}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Clear all data
+        function clearAll() {
+            if (confirm("Are you sure you want to clear all shot data?")) {
+                shotData = [];
+                currentMatchName = "Match 1";
+                playerNames = ['Player 1', 'Player 2'];
+                currentPoint = 1;
+                currentHit = 1;
+                createSelectionGrid();
+                resetCurrentShot();
+                updateDataDisplay();
+                updateMatchInfo();
+            }
+        }
+
+        // Update match info display
+        function updateMatchInfo() {
+            document.getElementById('currentMatch').textContent = currentMatchName;
+            document.getElementById('currentPoint').textContent = currentPoint;
+            document.getElementById('currentHit').textContent = currentHit;
+        }
+
+        // Update data display
+        function updateDataDisplay() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+
+            shotData.forEach(shot => {
+                const row = document.createElement('tr');
+                const columns = ['Match', 'Point', 'Hit', 'Player', 'Test Condition', 'Tempo', 'Stroke', 'Outcome', 'Shot X', 'Shot Y'];
+
+                columns.forEach(col => {
+                    const cell = document.createElement('td');
+                    cell.textContent = shot[col] || '';
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+
+            // Scroll to bottom
+            if (shotData.length > 0) {
+                const table = document.getElementById('dataTable');
+                table.scrollTop = table.scrollHeight;
+            }
+        }
+
+        // Handle Enter key in modal
+        document.addEventListener('keydown', function (event) {
+            const modal = document.getElementById('inputModal');
+            if (modal.style.display === 'block' && event.key === 'Enter') {
+                modalOK();
+            }
+        });
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Fallback initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+    </script>
+</body>
+
+</html>
