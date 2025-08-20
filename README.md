@@ -1,6 +1,6 @@
 # 🎾 Ward's Island Whacker
 
-This is my take on a tennis shot tracking app. Instead of being designed to track every shot in a rally, I've designed this to track specific, repeatable tennis shots for beginner and intermediate tennis players. Specifically, the app can be used to easily track serve, serve returns, and baseline rally shots. The purpose of this is to provide actionable recommendations for players who want to improve these fundamental tennis strokes.
+This is my take on a tennis shot tracking app. Instead of tracking every shot in a rally, I've designed it to track the major shots in tennis that can be easily controlled and repeated by beginner and intermediate players. Specifically, the app is used to track serve, serve returns, and baseline rally shots. The purpose of this is to provide actionable recommendations for players who want to improve these fundamental tennis strokes.
 
 ## Features
 
